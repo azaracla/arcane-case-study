@@ -25,7 +25,7 @@ def create_user():
 
 @mod_api.route('/account', methods=['PUT'])
 @authentificate
-def update(user_id):
+def update_user():
     """
     Update user data
     """
@@ -71,44 +71,59 @@ def get_all_assets():
     return jsonify({'assets':[asset.serialize for asset in assets]}), 200
 
 @mod_api.route('/assets', methods=['POST'])
+@authentificate
 def create_asset():
     """
     Create Asset Function
     """
 
     data = request.get_json()
+    user_id = request.authorization.username
 
     if not set(['name', 'type', 'city', 'rooms', 'details', 'owner']).issubset(list(data.keys())):
         abort(400)
     
-    asset = AssetModel(data)
+    asset = AssetModel(data, user_id)
     asset.create()
 
     return make_response(jsonify(asset.serialize), 201)
 
 @mod_api.route('/assets/<int:asset_id>', methods=['PUT'])
+@authentificate
 def update_asset(asset_id):
     """
     Update Asset Function
     """
 
     data = request.get_json()
+    user_id = request.authorization.username
+
     asset = AssetModel.get_one_asset(asset_id)
 
     if asset:
-        asset.update(data)
-        return make_response(jsonify({'asset': asset.serialize}), 200)
+        if user_id == asset.user_id:
+            asset.update(data)
+            return make_response(jsonify({'asset': asset.serialize}), 200)
+        else:
+            return make_response(jsonify({'error': 'You are only authorized to edit your own assets'}), 401)
     else:
         return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
 
 @mod_api.route('/assets/<int:asset_id>', methods=['DELETE'])
+@authentificate
 def delete_asset(asset_id):
     """
     Delete the asset selected by asset_id
     """
     asset = AssetModel.get_one_asset(asset_id)
+    user_id = request.authorization.username
+
     if asset:
-        asset.delete() 
-        return make_response(jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200)
+        if user_id == asset.user_id:
+            asset.delete() 
+            return make_response(jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200)
+        else:
+            return make_response(jsonify({'error': 'You are only authorized to delete your own assets'}), 401)
+
     else:
         return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)

@@ -81,8 +81,9 @@ class AssetModel(db.Model):
     rooms = db.Column(db.Integer, nullable=False)
     details = db.Column(db.String(2048), nullable=False)
     owner = db.Column(db.String(128), nullable=False)
+    user_id = db.Column(db.String(128), nullable=False)
     
-    def __init__(self, data):
+    def __init__(self, data, user_id):
         """
         Class Constructor
         """
@@ -92,6 +93,7 @@ class AssetModel(db.Model):
         self.rooms = data.get('rooms')
         self.details = data.get('details')
         self.owner = data.get('owner')
+        self.user_id = user_id
 
     def __repr__(self):
         return "<Asset {} : {}. Owner : {}>".format(self.name, self.type, self.owner)
@@ -128,5 +130,6 @@ class AssetModel(db.Model):
             'city' : self.city,
             'rooms' : self.rooms,
             'details' : self.details,
-            'owner' : self.owner
+            'owner' : self.owner,
+            'user_id': self.user_id
        }
