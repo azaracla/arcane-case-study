@@ -1,4 +1,5 @@
 from app import db
+from passlib.hash import sha256_crypt
 
 class UserModel(db.Model):
     """
@@ -10,6 +11,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     surname = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
     
     #class constructor
 
@@ -19,6 +21,7 @@ class UserModel(db.Model):
         """
         self.name = data.get('name')
         self.surname = data.get('surname')
+        self.password = self.generate_hash(data.get('password'))
         
     def __repr__(self):
         return "<User {} {}>".format(self.name, self.surname)
@@ -29,6 +32,8 @@ class UserModel(db.Model):
     
     def update(self,data):
         for key, item in data.items():
+            if key == 'password':
+                self.password = self.generate_hash(item)
             setattr(self, key, item)
         db.session.commit()
     
@@ -36,6 +41,12 @@ class UserModel(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def generate_hash(self, password):
+        return sha256_crypt.hash(password)
+
+    def check_hash(self, password):
+        return sha256_crypt.verify(self.password, password)
+    
     @staticmethod
     def get_all_users():
         return UserModel.query.all()
@@ -51,7 +62,8 @@ class UserModel(db.Model):
        return {
            'id': self.id,
            'name': self.name,
-           'surname'  : self.surname
+           'surname'  : self.surname,
+           'password_hash': self.password
        }
 
 

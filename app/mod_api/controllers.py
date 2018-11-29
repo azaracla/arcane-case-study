@@ -1,10 +1,13 @@
-from flask import request, Blueprint, jsonify, abort
+from flask import request, Blueprint, jsonify, abort, make_response
 from app import db
 from app.mod_api.models import UserModel, AssetModel
 
+from app.mod_api.helpers.decorators import authentificate
+from app.mod_api.helpers.errors import *
+
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 
-@mod_api.route('/users', methods=['POST'])
+@mod_api.route('/register', methods=['POST'])
 def create_user():
     """
     Create User Function
@@ -12,25 +15,30 @@ def create_user():
 
     data = request.get_json()
  
-    if not set(['name', 'surname']).issubset(list(data.keys())):
+    if not set(['name', 'surname', 'password']).issubset(list(data.keys())):
         abort(400)
     
     user = UserModel(data)
     user.create()
 
-    return jsonify(user.serialize)
+    return make_response(jsonify(user.serialize), 201)
 
-@mod_api.route('/users/<int:user_id>', methods=['PUT'])
+@mod_api.route('/account', methods=['PUT'])
+@authentificate
 def update(user_id):
-  """
-  Update user
-  """
-  data = request.get_json()
+    """
+    Update user data
+    """
 
-  user = UserModel.get_one_user(user_id)
-  user.update(data)
-  
-  return jsonify({'user': user.serialize}), 200
+    data = request.get_json()
+    user_id = request.authorization.username
+
+    user = UserModel.get_one_user(user_id)
+
+    user.update(data)
+    return make_response(jsonify({'user': user.serialize}), 200)
+
+## Accounts administration methods
 
 @mod_api.route('/users', methods=['GET'])
 def get_all():
@@ -38,7 +46,7 @@ def get_all():
     Return all users
     """
     users = UserModel.get_all_users()
-    return jsonify({'users':[user.serialize for user in users]}), 200
+    return make_response(jsonify({'users':[user.serialize for user in users]}), 200)
 
 @mod_api.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
@@ -48,9 +56,11 @@ def delete_user(user_id):
     user = UserModel.get_one_user(user_id)
     if user:
         user.delete() 
-        return jsonify({'success': 'User {} deleted'.format(user_id)}), 200
+        return make_response(jsonify({'success': 'User {} deleted'.format(user_id)}), 200)
     else:
-        return jsonify({'error': 'UserID {} not in the database'.format(user_id)}), 404
+        return make_response(jsonify({'error': 'UserID {} not in the database'.format(user_id)}), 404)
+
+
 
 @mod_api.route('/assets', methods=['GET'])
 def get_all_assets():
@@ -74,7 +84,7 @@ def create_asset():
     asset = AssetModel(data)
     asset.create()
 
-    return jsonify(asset.serialize)
+    return make_response(jsonify(asset.serialize), 201)
 
 @mod_api.route('/assets/<int:asset_id>', methods=['PUT'])
 def update_asset(asset_id):
@@ -83,11 +93,13 @@ def update_asset(asset_id):
     """
 
     data = request.get_json()
-
     asset = AssetModel.get_one_asset(asset_id)
-    asset.update(data)
-    
-    return jsonify({'asset': asset.serialize}), 200
+
+    if asset:
+        asset.update(data)
+        return make_response(jsonify({'asset': asset.serialize}), 200)
+    else:
+        return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
 
 @mod_api.route('/assets/<int:asset_id>', methods=['DELETE'])
 def delete_asset(asset_id):
@@ -97,6 +109,6 @@ def delete_asset(asset_id):
     asset = AssetModel.get_one_asset(asset_id)
     if asset:
         asset.delete() 
-        return jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200
+        return make_response(jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200)
     else:
-        return jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404
+        return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
