@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy import func
 from passlib.hash import sha256_crypt
 
 class UserModel(db.Model):
@@ -119,6 +120,12 @@ class AssetModel(db.Model):
     def get_one_asset(id):
         return AssetModel.query.get(id)
 
+    @staticmethod
+    def get_by_city(city):
+        """
+        Case-insensitive search by city
+        """
+        return AssetModel.query.filter(AssetModel.city.ilike('%{}%'.format(city))).all()
 
     @property
     def serialize(self):

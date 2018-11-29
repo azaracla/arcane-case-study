@@ -68,7 +68,19 @@ def get_all_assets():
     Return all assets
     """
     assets = AssetModel.get_all_assets()
-    return jsonify({'assets':[asset.serialize for asset in assets]}), 200
+
+    return make_response(jsonify({'assets':[asset.serialize for asset in assets]}), 200)
+
+@mod_api.route('/assets/city/<string:city>', methods=['GET'])
+def get_assets_by_city(city):
+    """
+    Filter assets by city (case-insensitive)
+    """
+
+    assets = AssetModel.get_by_city(city)
+
+    return make_response(jsonify({'city': city, 'assets':[asset.serialize for asset in assets]}), 200)
+
 
 @mod_api.route('/assets', methods=['POST'])
 @authentificate
@@ -97,7 +109,10 @@ def update_asset(asset_id):
 
     data = request.get_json()
     user_id = request.authorization.username
-
+    
+    # asset user_id is immutable
+    del data['user_id']
+    
     asset = AssetModel.get_one_asset(asset_id)
 
     if asset:
