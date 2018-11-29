@@ -1,6 +1,6 @@
 from flask import request, Blueprint, jsonify, abort
 from app import db
-from app.mod_api.models import UserModel
+from app.mod_api.models import UserModel, AssetModel
 
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -11,8 +11,8 @@ def create_user():
     """
 
     data = request.get_json()
-
-    if not 'name' in data or not 'surname' in data:
+ 
+    if not set(['name', 'surname']).issubset(list(data.keys())):
         abort(400)
     
     user = UserModel(data)
@@ -51,3 +51,27 @@ def delete_user(user_id):
         return jsonify({'success': 'User {} deleted'.format(user_id)}), 200
     else:
         return jsonify({'error': 'UserID {} not in the database'.format(user_id)}), 404
+
+@mod_api.route('/assets', methods=['GET'])
+def get_all_assets():
+    """
+    Return all assets
+    """
+    assets = AssetModel.get_all_assets()
+    return jsonify({'assets':[asset.serialize for asset in assets]}), 200
+
+@mod_api.route('/assets', methods=['POST'])
+def create_asset():
+    """
+    Create Asset Function
+    """
+
+    data = request.get_json()
+
+    if not set(['name', 'type', 'city', 'rooms', 'details', 'owner']).issubset(list(data.keys())):
+        abort(400)
+    
+    asset = AssetModel(data)
+    asset.create()
+
+    return jsonify(asset.serialize)
