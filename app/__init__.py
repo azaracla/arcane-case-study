@@ -15,6 +15,12 @@ db = SQLAlchemy(app)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+from app.mod_api.controllers import mod_api as api_module
+
+app.register_blueprint(api_module)
+
+db.create_all()
+
 @app.route('/', methods=['GET'])
 def index():
     return 'It works'
