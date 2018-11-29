@@ -75,3 +75,28 @@ def create_asset():
     asset.create()
 
     return jsonify(asset.serialize)
+
+@mod_api.route('/assets/<int:asset_id>', methods=['PUT'])
+def update_asset(asset_id):
+    """
+    Update Asset Function
+    """
+
+    data = request.get_json()
+
+    asset = AssetModel.get_one_asset(asset_id)
+    asset.update(data)
+    
+    return jsonify({'asset': asset.serialize}), 200
+
+@mod_api.route('/assets/<int:asset_id>', methods=['DELETE'])
+def delete_asset(asset_id):
+    """
+    Delete the asset selected by asset_id
+    """
+    asset = AssetModel.get_one_asset(asset_id)
+    if asset:
+        asset.delete() 
+        return jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200
+    else:
+        return jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404

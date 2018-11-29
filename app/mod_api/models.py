@@ -101,6 +101,11 @@ class AssetModel(db.Model):
     def get_all_assets():
         return AssetModel.query.all()
 
+    @staticmethod
+    def get_one_asset(id):
+        return AssetModel.query.get(id)
+
+
     @property
     def serialize(self):
        """Return object data in easily serializeable format"""
