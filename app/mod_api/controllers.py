@@ -1,6 +1,6 @@
 from flask import request, Blueprint, jsonify, abort, make_response
 from app import db
-from app.mod_api.models import UserModel, AssetModel
+from app.mod_api.models import UserModel, AssetModel, RoomModel
 
 from app.mod_api.helpers.decorators import authentificate
 from app.mod_api.helpers.errors import *
@@ -92,13 +92,29 @@ def create_asset():
     data = request.get_json()
     user_id = request.authorization.username
 
-    if not set(['name', 'type', 'city', 'rooms', 'details', 'owner']).issubset(list(data.keys())):
+    if not set(['name', 'type', 'city', 'rooms', 'owner']).issubset(list(data.keys())):
         abort(400)
     
     asset = AssetModel(data, user_id)
     asset.create()
 
+    rooms_data = data.get('rooms')
+    print(rooms_data)
+    for key, value in rooms_data.items():
+        room = RoomModel(asset.id, key, value)
+        room.create()
+
     return make_response(jsonify(asset.serialize), 201)
+
+@mod_api.route('/assets/<int:asset_id>/rooms', methods=['GET'])
+def get_asset_rooms(asset_id):
+    """
+    Return all assets
+    """
+    rooms = AssetModel.get_one_asset(asset_id).rooms
+
+    return make_response(jsonify({'rooms':[room.serialize for room in rooms]}), 200)
+
 
 @mod_api.route('/assets/<int:asset_id>', methods=['PUT'])
 @authentificate
