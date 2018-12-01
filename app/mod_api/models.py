@@ -186,6 +186,7 @@ class RoomModel(db.Model):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
+            'id': self.id,
             'name': self.name,
             'details': self.details
        }
