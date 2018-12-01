@@ -26,9 +26,9 @@ python run.py
 
 ### Informations
 
-Langage : Python
-Framework : Flask
-Base de donnée : SQLITE (avec l'ORM SQLAlchemy)
+<p>Langage : Python</p>
+<p>Framework : Flask</p>
+<p>Base de donnée : SQLITE (avec l'ORM SQLAlchemy)</p>
 
 ### Description de l'API
 
@@ -51,5 +51,5 @@ Base de donnée : SQLITE (avec l'ORM SQLAlchemy)
 
 ### Améliorations 
 
-Utiliser une base NoSQL comme MongoDB qui pourrait être bien appropriée au stockage de json 
-Utiliser Swagger pour la description de l'API
+<p>Utiliser une base NoSQL comme MongoDB qui pourrait être bien appropriée au stockage de json </p>
+<p>Utiliser Swagger pour la description de l'API</p>
