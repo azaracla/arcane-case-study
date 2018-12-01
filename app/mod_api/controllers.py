@@ -1,11 +1,19 @@
 from flask import request, Blueprint, jsonify, abort, make_response
 from app import db
 from app.mod_api.models import UserModel, AssetModel, RoomModel
-
+import datetime
 from app.mod_api.helpers.decorators import authentificate
 from app.mod_api.helpers.errors import *
 
 mod_api = Blueprint('api', __name__, url_prefix='/api')
+
+def validate(date_text):
+    try:
+        result = datetime.datetime.strptime(date_text, '%Y-%m-%d')
+        return result
+    except ValueError:
+        return False
+
 
 @mod_api.route('/register', methods=['POST'])
 def create_user():
@@ -18,6 +26,13 @@ def create_user():
     if not set(['name', 'surname', 'password']).issubset(list(data.keys())):
         abort(400)
     
+    if 'birthdate' in data.keys():
+        result = validate(data.get('birthdate'))
+        if result:
+            data['birthdate'] = result.date()
+        else:
+            return make_response(jsonify({'error': "Incorrect data format, should be YYYY-MM-DD"}), 401)
+
     user = UserModel(data)
     user.create()
 
@@ -32,6 +47,17 @@ def update_user():
 
     data = request.get_json()
     user_id = request.authorization.username
+
+    if not set(data.keys()).issubset(['name', 'surname', 'password', 'birthdate']):
+        abort(400)
+
+    if 'birthdate' in data.keys():
+        result = validate(data.get('birthdate'))
+        if result:
+            data['birthdate'] = result.date()
+        else:
+            return make_response(jsonify({'error': "Incorrect data format, should be YYYY-MM-DD"}), 401)
+
 
     user = UserModel.get_one_user(user_id)
 
@@ -92,7 +118,7 @@ def create_asset():
     data = request.get_json()
     user_id = request.authorization.username
 
-    if not set(['name', 'type', 'city', 'rooms', 'owner']).issubset(list(data.keys())):
+    if not set(['name', 'type', 'city', 'rooms', 'owner', 'description']).issubset(list(data.keys())):
         abort(400)
     
     asset = AssetModel(data, user_id)
@@ -216,7 +242,7 @@ def update_asset(asset_id):
     data = request.get_json()
     user_id = request.authorization.username
     
-    if not set(data.keys()).issubset(['name', 'type', 'city', 'owner']):
+    if not set(data.keys()).issubset(['name', 'type', 'city', 'owner', 'description']):
         abort(400)
 
     asset = AssetModel.get_one_asset(asset_id)

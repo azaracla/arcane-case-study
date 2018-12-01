@@ -12,6 +12,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     surname = db.Column(db.String(128), nullable=False)
+    birthdate = db.Column(db.Date, nullable=True)
     password = db.Column(db.String(128), nullable=False)
     
     #class constructor
@@ -22,6 +23,7 @@ class UserModel(db.Model):
         """
         self.name = data.get('name')
         self.surname = data.get('surname')
+        self.birthdate = data.get('birthdate',None)
         self.password = self.generate_hash(data.get('password'))
         
     def __repr__(self):
@@ -64,6 +66,7 @@ class UserModel(db.Model):
            'id': self.id,
            'name': self.name,
            'surname'  : self.surname,
+           'birthdate' : self.birthdate,
            'password_hash': self.password
        }
 
@@ -77,6 +80,7 @@ class AssetModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String(1024), nullable=False)
     type = db.Column(db.String(128), nullable=False)
     city = db.Column(db.String(128), nullable=False)
     rooms = db.relationship('RoomModel',backref='assets', lazy=True)
@@ -88,6 +92,7 @@ class AssetModel(db.Model):
         Class Constructor
         """
         self.name = data.get('name')
+        self.description = data.get('description')
         self.type = data.get('type')
         self.city = data.get('city')
         self.owner = data.get('owner')
@@ -130,6 +135,7 @@ class AssetModel(db.Model):
        return {
             'id': self.id,
             'name': self.name,
+            'description': self.description,
             'type' : self.type,
             'city' : self.city,
             'owner' : self.owner,
