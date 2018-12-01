@@ -1,11 +1,19 @@
 from flask import request, Blueprint, jsonify, abort, make_response
 from app import db
-from app.mod_api.models import UserModel, AssetModel
-
+from app.mod_api.models import UserModel, AssetModel, RoomModel
+import datetime
 from app.mod_api.helpers.decorators import authentificate
 from app.mod_api.helpers.errors import *
 
 mod_api = Blueprint('api', __name__, url_prefix='/api')
+
+def validate(date_text):
+    try:
+        result = datetime.datetime.strptime(date_text, '%Y-%m-%d')
+        return result
+    except ValueError:
+        return False
+
 
 @mod_api.route('/register', methods=['POST'])
 def create_user():
@@ -18,6 +26,13 @@ def create_user():
     if not set(['name', 'surname', 'password']).issubset(list(data.keys())):
         abort(400)
     
+    if 'birthdate' in data.keys():
+        result = validate(data.get('birthdate'))
+        if result:
+            data['birthdate'] = result.date()
+        else:
+            return make_response(jsonify({'error': "Incorrect data format, should be YYYY-MM-DD"}), 401)
+
     user = UserModel(data)
     user.create()
 
@@ -32,6 +47,17 @@ def update_user():
 
     data = request.get_json()
     user_id = request.authorization.username
+
+    if not set(data.keys()).issubset(['name', 'surname', 'password', 'birthdate']):
+        abort(400)
+
+    if 'birthdate' in data.keys():
+        result = validate(data.get('birthdate'))
+        if result:
+            data['birthdate'] = result.date()
+        else:
+            return make_response(jsonify({'error': "Incorrect data format, should be YYYY-MM-DD"}), 401)
+
 
     user = UserModel.get_one_user(user_id)
 
@@ -92,13 +118,119 @@ def create_asset():
     data = request.get_json()
     user_id = request.authorization.username
 
-    if not set(['name', 'type', 'city', 'rooms', 'details', 'owner']).issubset(list(data.keys())):
+    if not set(['name', 'type', 'city', 'rooms', 'owner', 'description']).issubset(list(data.keys())):
         abort(400)
     
     asset = AssetModel(data, user_id)
     asset.create()
 
+    rooms_data = data.get('rooms')
+    print(rooms_data)
+    for key, value in rooms_data.items():
+        room = RoomModel(asset.id, key, value)
+        room.create()
+
     return make_response(jsonify(asset.serialize), 201)
+
+@mod_api.route('/assets/<int:asset_id>/rooms', methods=['GET'])
+def get_asset_rooms(asset_id):
+    """
+    Return all assets
+    """
+    rooms = AssetModel.get_one_asset(asset_id).rooms
+
+    return make_response(jsonify({'rooms':[room.serialize for room in rooms]}), 200)
+
+
+@mod_api.route('/assets/<int:asset_id>/rooms', methods=['POST'])
+@authentificate
+def add_room(asset_id):
+    """
+    Add room to asset (asset_id)
+    """
+
+    data = request.get_json()
+    user_id = request.authorization.username
+
+    if not set(['name', 'details']).issubset(list(data.keys())):
+        abort(400)
+    
+    asset = AssetModel.get_one_asset(asset_id)
+
+    if asset:
+        if user_id == asset.user_id:
+            room = RoomModel(asset_id, data.get('name'), data.get('details'))
+            room.create()
+            return make_response(jsonify({'room':room.serialize}), 200)
+        else:
+            return make_response(jsonify({'error': 'You are only authorized to edit your own assets'}), 401)
+    else:
+        return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
+
+    
+@mod_api.route('/assets/<int:asset_id>/rooms/<int:room_id>', methods=['DELETE'])
+@authentificate
+def delete_room(asset_id, room_id):
+    """
+    Delete room (room_id) from asset (asset_id)
+    """
+
+    data = request.get_json()
+    user_id = request.authorization.username
+
+    if not set(['name', 'details']).issubset(list(data.keys())):
+        abort(400)
+
+    asset = AssetModel.get_one_asset(asset_id)
+
+    if asset:
+        if user_id == asset.user_id:
+            room = RoomModel.get_one_room(room_id)
+            if room:
+                name = room.name
+                room.delete()
+                return make_response(jsonify({'success': 'Room {} ({}) from asset {} deleted'.format(room_id, name, asset_id)}), 200)
+            else:
+                return make_response(jsonify({'error': 'RoomID {} not in the database'.format(room_id)}), 404)
+
+        else:
+            return make_response(jsonify({'error': 'You are only authorized to edit your own assets'}), 401)
+    else:
+        return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
+
+
+@mod_api.route('/assets/<int:asset_id>/rooms/<int:room_id>', methods=['PUT'])
+@authentificate
+def update_room(asset_id, room_id):
+    """
+    Update room
+    """
+
+    data = request.get_json()
+    user_id = request.authorization.username
+
+    if not set(data.keys()).issubset(['name', 'details']):
+        abort(400)
+
+    asset = AssetModel.get_one_asset(asset_id)
+
+    if asset:
+        if user_id == asset.user_id:
+            room = RoomModel.get_one_room(room_id)
+            if room:
+                name = room.name
+                room.update(data)
+                return make_response(jsonify({'room': room.serialize}), 200)
+            else:
+                return make_response(jsonify({'error': 'RoomID {} not in the database'.format(room_id)}), 404)
+
+        else:
+            return make_response(jsonify({'error': 'You are only authorized to edit your own assets'}), 401)
+    else:
+        return make_response(jsonify({'error': 'AssetID {} not in the database'.format(asset_id)}), 404)
+
+
+
 
 @mod_api.route('/assets/<int:asset_id>', methods=['PUT'])
 @authentificate
@@ -110,9 +242,9 @@ def update_asset(asset_id):
     data = request.get_json()
     user_id = request.authorization.username
     
-    # asset user_id is immutable
-    del data['user_id']
-    
+    if not set(data.keys()).issubset(['name', 'type', 'city', 'owner', 'description']):
+        abort(400)
+
     asset = AssetModel.get_one_asset(asset_id)
 
     if asset:
@@ -135,7 +267,11 @@ def delete_asset(asset_id):
 
     if asset:
         if user_id == asset.user_id:
-            asset.delete() 
+
+            for room in asset.rooms:
+                room.delete()
+
+            asset.delete()
             return make_response(jsonify({'success': 'Asset {} deleted'.format(asset_id)}), 200)
         else:
             return make_response(jsonify({'error': 'You are only authorized to delete your own assets'}), 401)

@@ -12,6 +12,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     surname = db.Column(db.String(128), nullable=False)
+    birthdate = db.Column(db.Date, nullable=True)
     password = db.Column(db.String(128), nullable=False)
     
     #class constructor
@@ -22,6 +23,7 @@ class UserModel(db.Model):
         """
         self.name = data.get('name')
         self.surname = data.get('surname')
+        self.birthdate = data.get('birthdate',None)
         self.password = self.generate_hash(data.get('password'))
         
     def __repr__(self):
@@ -64,6 +66,7 @@ class UserModel(db.Model):
            'id': self.id,
            'name': self.name,
            'surname'  : self.surname,
+           'birthdate' : self.birthdate,
            'password_hash': self.password
        }
 
@@ -77,10 +80,10 @@ class AssetModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String(1024), nullable=False)
     type = db.Column(db.String(128), nullable=False)
     city = db.Column(db.String(128), nullable=False)
-    rooms = db.Column(db.Integer, nullable=False)
-    details = db.Column(db.String(2048), nullable=False)
+    rooms = db.relationship('RoomModel',backref='assets', lazy=True)
     owner = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.String(128), nullable=False)
     
@@ -89,10 +92,9 @@ class AssetModel(db.Model):
         Class Constructor
         """
         self.name = data.get('name')
+        self.description = data.get('description')
         self.type = data.get('type')
         self.city = data.get('city')
-        self.rooms = data.get('rooms')
-        self.details = data.get('details')
         self.owner = data.get('owner')
         self.user_id = user_id
 
@@ -133,10 +135,64 @@ class AssetModel(db.Model):
        return {
             'id': self.id,
             'name': self.name,
+            'description': self.description,
             'type' : self.type,
             'city' : self.city,
-            'rooms' : self.rooms,
-            'details' : self.details,
             'owner' : self.owner,
-            'user_id': self.user_id
+            'user_id': self.user_id,
+            'rooms': [room.serialize for room in self.rooms]
+       }
+
+class RoomModel(db.Model):
+    """
+    Room Model
+    """
+
+    __tablename__ = 'rooms'
+
+    id = db.Column(db.Integer, primary_key=True)
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id'), nullable = False)
+    name = db.Column(db.String(128), nullable = False)
+    details = db.Column(db.String(1024), nullable =False)
+    
+    def __init__(self, asset_id, name, details):
+        """
+        Class Constructor
+        """
+        self.asset_id = asset_id
+        self.name = name
+        self.details = details
+
+
+    def __repr__(self):
+        return "<Room {} : {}. Asset_id : {}>".format(self.name, self.details, self.asset_id)
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self,data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all_rooms():
+        return RoomModel.query.all()
+
+    @staticmethod
+    def get_one_room(id):
+        return RoomModel.query.get(id)
+
+    @property
+    def serialize(self):
+       """Return object data in easily serializeable format"""
+       return {
+            'id': self.id,
+            'name': self.name,
+            'details': self.details
        }
