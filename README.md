@@ -1,4 +1,4 @@
-# arcane-case-study
+# Etude de cas Arcane
 
 ### Installation
 
