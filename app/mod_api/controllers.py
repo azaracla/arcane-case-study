@@ -64,6 +64,21 @@ def update_user():
     user.update(data)
     return make_response(jsonify({'user': user.serialize}), 200)
 
+
+@mod_api.route('/account', methods=['GET'])
+@authentificate
+def get_account():
+    """
+    Return all users
+    """
+
+    user_id = request.authorization.username
+
+    user = UserModel.get_one_user(user_id)
+
+    return make_response(jsonify({'user': user.serialize}), 200)
+
+
 ## Accounts administration methods
 
 @mod_api.route('/users', methods=['GET'])

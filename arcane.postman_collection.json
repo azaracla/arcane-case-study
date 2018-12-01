@@ -1,0 +1,550 @@
+{
+	"info": {
+		"_postman_id": "e050c2ec-691f-4288-8a56-627d21c2be69",
+		"name": "arcane",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get users",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Aurélie\",\n\t\"surname\": \"Alcaraz\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Julie\",\n\t\"surname\": \"Alcaraz\",\n\t\"password\": \"foo\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/register",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "-arthur63-",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "2",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"aurélie\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/account",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "test",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Julie\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/users/2",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get assets",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1/rooms",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1",
+						"rooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add asset",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "-julie63-",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "2",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Belle maison\",\n    \"type\" : \"Maison\",\n    \"city\" : \"lyon\",\n    \"rooms\" : {\n    \t\"cuisine\": \"grande cuisine\",\n    \t\"chambre\": \"30m2\"\n    },\n    \"owner\" : \"Franck Alcaraz\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update asset",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "-julie63-",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "2",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"user_id\": 2\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete asset",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Grand studio\",\n    \"type\" : \"Studio F2\",\n    \"city\" : \"Paris\",\n    \"rooms\" : 2,\n    \"details\" : \"Des détails sur les pièces\",\n    \"owner\" : \"John Smith\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get by city",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Grand studio\",\n    \"type\" : \"Studio F2\",\n    \"city\" : \"Paris\",\n    \"rooms\" : 2,\n    \"details\" : \"Des détails sur les pièces\",\n    \"owner\" : \"John Smith\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/city/lyon",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"city",
+						"lyon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get rooms from asset 1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Grand studio\",\n    \"type\" : \"Studio F2\",\n    \"city\" : \"Paris\",\n    \"rooms\" : 2,\n    \"details\" : \"Des détails sur les pièces\",\n    \"owner\" : \"John Smith\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1/rooms",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1",
+						"rooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add room to asset 1",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "-arthur63-",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Salle de bain\",\n    \"details\": \"Beau lavabo\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1/rooms",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1",
+						"rooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete room",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "-arthur63-",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Grand studio\",\n    \"type\" : \"Studio F2\",\n    \"city\" : \"Paris\",\n    \"rooms\" : 2,\n    \"details\" : \"Des détails sur les pièces\",\n    \"owner\" : \"John Smith\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/1/rooms/3",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"1",
+						"rooms",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update room",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Grand studio\",\n    \"type\" : \"Studio F2\",\n    \"city\" : \"Paris\",\n    \"rooms\" : 2,\n    \"details\" : \"Des détails sur les pièces\",\n    \"owner\" : \"John Smith\"\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8080/api/assets/city/Paris",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"city",
+						"Paris"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
