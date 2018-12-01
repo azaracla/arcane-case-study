@@ -49,6 +49,10 @@ python run.py
 | PUT          | /assets/<asset_id>                 | Modifie le bien <asset_id>                   |
 | DELETE       | /assets/<asset_id>                 | Supprime le bien <asset_id>                  |
 
+### Tests
+
+Pour des raisons de rapidité, j'ai effectué mes tests grâce à Postman. J'ai exporté la collection de requêtes dans un fichier JSON. 
+
 ### Améliorations 
 
 <p>Utiliser une base NoSQL comme MongoDB qui pourrait être bien appropriée au stockage de json </p>
