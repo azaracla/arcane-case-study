@@ -30,6 +30,8 @@ python run.py
 <p>Framework : Flask</p>
 <p>Base de donnée : SQLITE (avec l'ORM SQLAlchemy)</p>
 
+<p>Les urls décorés de @authentificate nécessitent une authentification (Basic Auth) avec comme username l'id de l'utilisateur et le mot de passe défini à l'inscription.</p>
+
 ### Description de l'API
 
 
@@ -57,3 +59,4 @@ Pour des raisons de rapidité, j'ai effectué mes tests grâce à Postman. J'ai 
 
 <p>Utiliser une base NoSQL comme MongoDB qui pourrait être bien appropriée au stockage de json </p>
 <p>Utiliser Swagger pour la description de l'API</p>
+<p>Améliorer le système d'authentification (construit ici de manière simpliste) avec des tokens</p>
